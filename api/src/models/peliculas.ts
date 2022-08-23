@@ -14,7 +14,7 @@ class Peliculas {
   @prop({ type: String, required: true })
   genero: string;
 
-  @prop({ type: number, required: true, maxlength: 4 })
+  @prop({ type: Number, required: true })
   año: number;
   @prop({ type: String, required: true })
   Director: string;

@@ -4,7 +4,8 @@
   "description": "ticmas chanllenges",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsnd --respawn src/index.ts",
+    "debug": "tsnd --debug --respawn src/index.ts",
     "build": "tsc"
   },
   "repository": {
