@@ -1,7 +1,7 @@
 import { Response, Request, NextFunction} from 'express';
 import { nextTick } from 'process';
 import pelicula from '../models/peliculas';
-import { CreatePelicula, CreatePeliculaSchema } from '../schema/pelicula.schema';
+import { CreatePelicula, CreatePeliculasSchema } from '../schema/pelicula.schema';
 
 export const crearPelicula = async(
     req: Request<unknown,unknown, CreatePelicula>,
@@ -9,7 +9,7 @@ export const crearPelicula = async(
     siguiente: NextFunction
 ) => {
     try {
-        const {titulo, genero, año, director , actor} = req.body;
+        const {titulo, genero, año, Director , Actores} = req.body;
 
         //Busqueda de alguna pelicula existentes con el mismo titulo
         const peliculaFound = await pelicula.findOne({ titulo });
@@ -18,9 +18,10 @@ export const crearPelicula = async(
         if(peliculaFound) return res.status(400).json({message: "la pelicula ya existe en la base de datos"});
 
         //Se crea una nueva pelicula
-        const nuevaPelicula = new pelicula({titulo, genero, año, director, actor});
+        const nuevaPelicula = new pelicula({titulo, genero, año, Director, Actores});
 
-        const guardarPelicula = await nuevaPelicula.save();
+        await nuevaPelicula.save();
+        res.redirect("/movie/list");
     } catch (error) {
         siguiente(error);
     }
@@ -33,6 +34,9 @@ export const buscarPeliculas = async (
   ) => {
     try {
       const videos = await pelicula.find();
+      res.render("/movie/list", {
+        videos
+      });
       return res.json(videos);
     } catch (error) {
       next(error);
@@ -47,7 +51,9 @@ export const buscarPeliculas = async (
     try {
       const videoFound = await pelicula.findById(req.params.id);
       if (!videoFound) return res.status(204).json();
-      return res.json(videoFound);
+      res.render("/movie/list", {
+       videoFound
+      });
     } catch (error) {
       next(error);
     }
@@ -57,17 +63,16 @@ export const buscarPeliculas = async (
     const videoFound = await pelicula.findByIdAndDelete(req.params.id);
   
     if (!videoFound) return res.status(204).json();
-  
-    return res.status(204).json();
+    res.redirect("/movie/list");
   };
   
   export const actualizarPelicula = async (
     req: Request,
     res: Response
-  ): Promise<Response> => {
+  ) => {
     const videoUpdated = await pelicula.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
     if (!videoUpdated) return res.status(204).json();
-    return res.json(videoUpdated);
+    res.redirect("/movie/list");
   };

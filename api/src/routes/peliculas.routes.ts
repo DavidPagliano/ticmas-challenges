@@ -9,13 +9,13 @@ import {
   actualizarPelicula,
 } from "../controllers/Peliculas.controller";
 import { validateSchema } from "../middleware/validateSchema.middleware";
-import { CreatePeliculaSchema } from "../schema/pelicula.schema";
+import { CreatePeliculasSchema } from "../schema/pelicula.schema";
 
 router.get("/peliculas", buscarPeliculas);
 
 router.get("/peliculas/:id", buscarPelicula);
 
-router.post("/peliculas", validateSchema(CreatePeliculaSchema), crearPelicula);
+router.post("/peliculas", validateSchema(CreatePeliculasSchema), crearPelicula);
 
 router.delete("/peliculas/:id", eliminarPelicula);
 

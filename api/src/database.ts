@@ -1,11 +1,22 @@
-import mongoose from "mongoose";
+import mongoose, {connect, connection} from "mongoose";
 import { MONGODB_URI } from "./config";
 
 export async function connectDB() {
   try {
-    const db = await mongoose.connect(MONGODB_URI);
-    console.log("Database is connected to: ", db.connection.name);
+    await connect(MONGODB_URI);
   } catch (error) {
-    console.error(error);
+    console.log("Error:", error);
   }
 }
+
+connection.on("connected", () => {
+  console.log("Mongodb connected to:", connection.db.databaseName);
+});
+
+connection.on("error", (error) => {
+  console.error("error", error);
+});
+
+connection.on("disconnected", () => {
+  console.log("Mongodb disconnected");
+});
