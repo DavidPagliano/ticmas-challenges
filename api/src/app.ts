@@ -1,32 +1,56 @@
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
+import path from "path";
+import { create } from "express-handlebars";
 
+
+import { PORT } from "./config";
 import moviesRoutes from "./routes/peliculas.routes";
 
-const app = express();
+export class App {
+  app: express.Application;
 
-app.use(cors());
-app.use(morgan("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+  constructor() {
+    this.app = express();
+    this.settings();
+    this.middlewares();
+    this.routes();
+  }
 
-app.use(moviesRoutes);
+  settings() {
+    this.app.set("views", path.join(__dirname, "views"));
+    this.app.engine(
+      ".hbs",
+      create({
+        layoutsDir: path.join(this.app.get("views"), "layouts"),
+        partialsDir: path.join(this.app.get("views"), "partials"),
+        defaultLayout: "main",
+        extname: ".hbs",
+      }).engine
+    );
+    this.app.set("view engine", ".hbs");
+  }
 
-app.use((req, res, next) => {
-  const error: any = new Error("Not found");
-  error.status = 404;
-  next(error);
+  middlewares() {
+    this.app.use(cors());
+    this.app.use(morgan("dev"));
+    this.app.use(express.urlencoded({ extended: false }));
+    this.app.use(express.json());
+  }
+
+  routes() {
+    this.app.use("/movies", moviesRoutes);
+
+    this.app.use(express.static(path.join(__dirname, "public")));
+  }
+
+  start(): void {
+    this.app.listen(PORT, () => {
+      console.log("Server is running at", PORT);
+    });
+  }
 }
-);
 
-app.use((error: any, req: any, res: any, next: any) => {
-  res.status(error.status || 500);
-  res.json({
-    error: {
-      message: error.message,
-    },
-  });
-})
 
-export default app;
+export default App;

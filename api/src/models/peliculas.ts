@@ -1,6 +1,4 @@
 import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
-import { number } from "zod";
-
 @modelOptions({
   schemaOptions: {
     versionKey: false,
